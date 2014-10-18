@@ -2,12 +2,26 @@ var config = require('cloud/config/config');
 
 var Article = Parse.Object.extend('Article', {
   // Instance methods
-  // saveNikkeiArticle: function(nikkeiArticle) {
-  //   this.save({
-  //     title: nikkeiArticle.title,
-  //     location: nikkeiArticle.location
-  //   });
-  // }
+
+  // NO translation from Nikkei format, this is a todo
+  saveNikkeiArticle: function(nikkeiArticle) {
+
+    // Hardcode these for now
+    // Use Maps API to get lat/long later
+    var locationPoint = new Parse.GeoPoint({
+      latitude: 40.0,
+      longitude: -30.0
+    });
+
+    this.save({
+      title: nikkeiArticle.title,
+      category: nikkeiArticle.uid,
+      body: nikkeiArticle.body,
+      source: 'Nikkei',
+      sourceId: nikkeiArticle.kiji_id,
+      location: locationPoint
+    });
+  }
 }, {
   // Class methods
 });
@@ -15,12 +29,17 @@ var Article = Parse.Object.extend('Article', {
 // Parse.Cloud.job('getNikkei', function(request, status) {
 // });
 
+Parse.Cloud.define('testDateParse', function(req, res) {
+  var endDate = new Date();
+});
+
 Parse.Cloud.define('test', function(req, res) {
   Parse.Cloud.httpRequest({
     url: config.NIKKEI.BASEURL + 'xsearch',
     params: {
-      keyword: 'エボラ',
-      baitai_id: '20141016', // Date?
+      keyword: 'Waterloo',
+      date_from: '2014-03-01 00:00',
+      date_to: '2014-03-08 00:00',
       fields: 'body index_images'
     },
     headers: {
