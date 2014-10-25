@@ -24,10 +24,11 @@
         width: 60px;
         border: 1px solid #bdc3c8;
         margin-top: 8px;
-        background: white;
+        background: #f2f2f2;
         -webkit-box-shadow: 0 0  3px #000;
         box-shadow: 0 0 3px #000;
         cursor: pointer;
+        opacity: 0.9;
       }
 
       .content img {
@@ -51,6 +52,11 @@
         box-shadow: inset 0 0 5px 5px #222;
       }
 
+      #navigation img{
+        height: 100%;
+        width: 100%;
+      }
+
     </style>
     <!-- Google Maps API -->
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=set_to_true_or_false"></script>
@@ -63,13 +69,16 @@
     <script src="js/bootstrap.min.js"></script>
     <!-- side panel js -->
     <script type="text/javascript" src="js/jquery.panelslider.min.js"></script>
+    <!-- parse -->
+    <script src="http://www.parsecdn.com/js/parse-1.3.1.min.js"></script>
   </head>
 
   <!--BODYYYYYYYYYYYYYY
   !-->
 
   <body>
-    <nav class="navbar navbar-default" role="navigation">TwentyFour</nav>
+    <nav class="navbar navbar-default" role="navigation" id="navigation">
+      <img src="assets/top.jpg"></nav>
     <div id="mainView">
       <a href="#">
         <div id="map-canvas"></div>
@@ -82,7 +91,8 @@
           <div class="cd-panel-container">
 
               <div class="cd-panel-content">
-                  <h3 id="article_title">Title Goes Here</h1>
+                  <h3 id="article_title">Title Goes Here</h3>
+                  <img id="article_image" src="assets/story1.jpeg" alt="Smiley face" height="100" width="200">
                     <p id="article_content">content here</p>
                   <!-- your side content here -->
               </div> <!-- cd-panel-content -->
@@ -107,26 +117,28 @@
 
       var mapStyle = [
         {
-          "featureType": "landscape.natural.landcover",
+          "featureType": "landscape",
           "elementType": "geometry.fill",
           "stylers": [
-            { "visibility": "on" },
-            { "color": "#ffcc00" },
-            { "lightness": 75 }
-          ]
-        },
-        {
-          featureType: "road",
-          elementType: "geometry",
-          stylers: [
-            { lightness: 100 },
-            { visibility: "simplified" }
+            { "color": "#a1aed6" },
+            { "visibility": "on" }
           ]
         },{
-          featureType: "road",
-          elementType: "labels",
-          stylers: [
-            { visibility: "off" }
+          "featureType": "water",
+          "stylers": [
+            { "color": "#f2f2f2" }
+          ]
+        },{
+          "elementType": "labels",
+          "stylers": [
+            { "visibility": "off" }
+          ]
+        },{
+        },{
+          "featureType": "landscape",
+          "elementType": "geometry.stroke",
+          "stylers": [
+            { "visibility": "off" }
           ]
         }
       ];
@@ -140,98 +152,238 @@
 
       var boxOffset = new google.maps.Size(10, -60);
 
-      var newsContent1 = '<div class="content">' + '<img src="assets/story1.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'In blow to Abe, Japan trade minister to resign over funds scandal: media'  + '</p>' +'</div>';
+      var stories = []
 
-      var newsMarker1 = new google.maps.Marker({
-          position: {lat: 35.6894875, lng: 139.69170639999993},
-          map: worldMap,
-          title:"In blow to Abe, Japan trade minister to resign over funds scandal: media"
-      });
+      Parse.initialize("2Xaapn0mwNR8Z8jSb2E47DygGDpEAlO2Ily0IXrk", "9hDjxbnJPXgf0NRM0RRbR80wT9axDxLtAqXOJcgB");
 
-      var infoBox1 = new InfoBox({
-            content: newsContent1,
+      Parse.Cloud.run('getUpdatedHeadlines', {}, {
+        success: function(result) {
+          console.log(result);
+          stories = result;
+
+          var newsContent1 = '<div id="c1" class="content">' + '<img src="' + stories[1].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[1].attributes.title + '</p>' + '</div>'
+
+          var newsMarker1 = new google.maps.Marker({
+              position: {lat: 35.6894875, lng: 139.69170639999993},
+              map: worldMap,
+              title:"In blow to Abe, Japan trade minister to resign over funds scandal: media"
+          });
+
+          var infoBox1 = new InfoBox({
+                content: newsContent1,
+                closeBoxURL: "",
+                closeBoxMargin : "",
+                pixelOffset: boxOffset
+          });
+
+          infoBox1.open(worldMap,newsMarker1);
+          infoBox1.addListener("domready", function() {
+
+            $('#c1').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[1].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[1].attributes.body;
+              document.getElementById("article_image").src =  stories[1].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+          var newsContent2 = '<div id="c2" class="content">' + '<img src="' + stories[2].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[2].attributes.title + '</p>' + '</div>'
+
+          var newsMarker2 = new google.maps.Marker({
+              position: {lat: 58.0500, lng: 118.2500},
+              map: worldMap,
+              title:"In blow to Abe, Japan trade minister to resign over funds scandal: media"
+          });
+
+          var infoBox2 = new InfoBox({
+                content: newsContent2,
+                closeBoxURL: "",
+                closeBoxMargin : "",
+                pixelOffset: boxOffset
+          });
+
+          infoBox2.open(worldMap,newsMarker2);
+          infoBox2.addListener("domready", function() {
+
+            $('#c2').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[2].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[2].attributes.body;
+              document.getElementById("article_image").src =  stories[2].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+          var newsContent3 = '<div id="c3" class="content">' + '<img src="' + stories[3].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[3].attributes.title + '</p>' + '</div>'
+
+          var newsMarker3 = new google.maps.Marker({
+              position: {lat: 38.9071923, lng: -77.03687070000001},
+              map: worldMap,
+              title:"Obama names Ebola 'czar,' bolsters Texas response "
+          });
+
+          var infoBox3 = new InfoBox({
+            content: newsContent3,
             closeBoxURL: "",
             closeBoxMargin : "",
             pixelOffset: boxOffset
+          });
+
+          infoBox3.open(worldMap,newsMarker3);
+          infoBox3.addListener("domready", function() {
+
+            $('#c3').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[3].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[3].attributes.body;
+              document.getElementById("article_image").src =  stories[3].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+          var newsContent4 = '<div id="c4" class="content">' + '<img src="' + stories[4].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[4].attributes.title + '</p>' + '</div>'
+
+          var newsMarker4 = new google.maps.Marker({
+              position: {lat: 27.7, lng: 85.33333300000004},
+              map: worldMap,
+              title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
+          });
+
+          var infoBox4 = new InfoBox({
+            content: newsContent4,
+            closeBoxURL: "",
+            closeBoxMargin : "",
+            pixelOffset: boxOffset
+          });
+
+          infoBox4.open(worldMap,newsMarker4);
+          infoBox4.addListener("domready", function() {
+
+            $('#c4').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[4].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[4].attributes.body;
+              document.getElementById("article_image").src =  stories[4].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+          var newsContent5 = '<div id="c5" class="content">' + '<img src="' + stories[5].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[5].attributes.title + '</p>' + '</div>'
+
+          var newsMarker5 = new google.maps.Marker({
+              position: {lat: 57.7, lng: 85.33333300000004},
+              map: worldMap,
+              title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
+          });
+
+          var infoBox5 = new InfoBox({
+            content: newsContent5,
+            closeBoxURL: "",
+            closeBoxMargin : "",
+            pixelOffset: boxOffset
+          });
+
+          infoBox5.open(worldMap,newsMarker5);
+          infoBox5.addListener("domready", function() {
+
+            $('#c5').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[5].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[5].attributes.body;
+              document.getElementById("article_image").src =  stories[5].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+          var newsContent6 = '<div id="c6" class="content">' + '<img src="' + stories[7].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[7].attributes.title + '</p>' + '</div>'
+
+          var newsMarker6 = new google.maps.Marker({
+              position: {lat: 47.7, lng: 25.33333300000004},
+              map: worldMap,
+              title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
+          });
+
+          var infoBox6 = new InfoBox({
+            content: newsContent6,
+            closeBoxURL: "",
+            closeBoxMargin : "",
+            pixelOffset: boxOffset
+          });
+
+          infoBox6.open(worldMap,newsMarker6);
+          infoBox6.addListener("domready", function() {
+
+            $('#c6').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[7].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[7].attributes.body;
+              document.getElementById("article_image").src =  stories[7].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+
+        },
+        error: function(error) {
+        }
       });
 
-      infoBox1.open(worldMap,newsMarker1);
-      infoBox1.addListener("domready", function() {
-
-        $('.content').on('click', function(event){
-          event.preventDefault();
-          $('.cd-panel').addClass('is-visible');
-
-          document.getElementById("article_title").innerHTML = "In blow to Abe, Japan trade minister to resign over funds scandal: media";
-          document.getElementById("article_content").innerHTML = "CHECK OUT HTIS COOL ARTICLESDFSDFSDF";
-        });
-        //clode the lateral panel
-        $('.cd-panel').on('click', function(event){
-          if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
-            $('.cd-panel').removeClass('is-visible');
-            event.preventDefault();
-          }
-        });
-        
-      });
-
-      var newsContent2 = '<div class="content">' + '<img src="assets/story2.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'Rebels kill more than 20 people in east Congo village' + '</p>' +'</div>';
-
-      var newsMarker2 = new google.maps.Marker({
-          position: {lat: -4.331666999999999, lng: 15.313889000000017},
-          map: worldMap,
-          animation: google.maps.Animation.BOUNCE,
-          title:"Rebels kill more than 20 people in east Congo village"
-      });
-
-      var infoBox2 = new InfoBox({
-        content: newsContent2,
-        closeBoxURL: "",
-        closeBoxMargin : "",
-        pixelOffset: boxOffset
-      });
-
-      infoBox2.open(worldMap,newsMarker2);
-
-      infoBox2.addListener("domready", function() {
-        $(".content").on("click", function(e) { $.panelslider($('#sidePanel')); });
-        
-      });
-
-      var newsContent3 = '<div class="content">' + '<img src="assets/story3.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'Obama names Ebola "czar," bolsters Texas response ' + '</p>' +'</div>';
-
-      var newsMarker3 = new google.maps.Marker({
-          position: {lat: 38.9071923, lng: -77.03687070000001},
-          map: worldMap,
-          title:"Obama names Ebola 'czar,' bolsters Texas response "
-      });
-
-      var infoBox3 = new InfoBox({
-        content: newsContent3,
-        closeBoxURL: "",
-        closeBoxMargin : "",
-        pixelOffset: boxOffset
-      });
-
-      infoBox3.open(worldMap,newsMarker3);
-
-      var newsContent4 = '<div class="content">' + '<img src="assets/story4.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'Nepali troops seek at least 40 missing on blizzard-hit trek' + '</p>' +'</div>';
-
-      var newsMarker4 = new google.maps.Marker({
-          position: {lat: 27.7, lng: 85.33333300000004},
-          map: worldMap,
-          title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
-      });
-
-      var infoBox4 = new InfoBox({
-        content: newsContent4,
-        closeBoxURL: "",
-        closeBoxMargin : "",
-        pixelOffset: boxOffset
-      });
-
-      infoBox4.open(worldMap,newsMarker4);
-
+      
       
 
       //bind click event on infoBoxes
