@@ -62,7 +62,7 @@ function retrieveNikkeiArticles(keyword) {
     params: {
       keyword: keyword,
       date_from: '2014-10-01 00:00',
-      date_to: '2014-10-35 00:00',
+      date_to: '2014-10-31 00:00',
       fields: 'body index_images'
     },
     headers: {
@@ -76,6 +76,16 @@ function retrieveNikkeiArticles(keyword) {
       for (i = 0; i < content.hits.length; i++) {
         var article = new Article();
         var images = [];
+        var locationHack = {
+          'ロサンゼルス': 'Los Angeles',
+          'ロンドン': 'London',
+          '中国': 'Beijing', // Just use Beijing to rep China
+          '東京': 'Tokyo',
+          'ナイジェリア': 'Abuja', //'Nigeria',
+          'スーダン': 'Khartoum', //'Sudan'
+          'ダラス': 'Dallas'
+
+        };
 
         if (content.hits[i].index_images.length != 0) {
           _.forEach(content.hits[i].index_images, function(image) {
@@ -91,6 +101,7 @@ function retrieveNikkeiArticles(keyword) {
             display_time: content.hits[i].display_time,
             newsDate: new Date(Date.parse(content.hits[i].display_time)),
             keyword: keyword,
+            location: locationHack[keyword],
             imageUrls: images
           }));
         }
@@ -119,6 +130,7 @@ function retrieveNikkeiArticles(keyword) {
 
 Parse.Cloud.define('test', function(request, response) {
   var locationKeywords = ['ロサンゼルス', 'ロンドン', '中国', '東京'];
+  //var locationKeywords = ['ナイジェリア', 'スーダン', 'ダラス'];
   var promises = [];
 
   _.forEach(locationKeywords, function(location) {
