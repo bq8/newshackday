@@ -12,17 +12,22 @@ var ArticleHandler = (function() {
     q.limit(config.HEADLINE_LIMIT);
 
     q.find().then(function(result) {
-      var responseObject = [];
+      if (result) {
+        res.success(result);
+      } else {
+        res.error('No results found.');
+      }
+      // var responseObject = [];
 
-      _.forEach(result, function(article) {
-        responseObject.push({
-          'objectId': article.id,
-          'title': article.get('title'),
-          'url': article.get('sourceId')
-        });
-      });
+      // _.forEach(result, function(article) {
+      //   responseObject.push({
+      //     'objectId': article.id,
+      //     'title': article.get('title'),
+      //     'url': article.get('sourceId')
+      //   });
+      // });
 
-      res.success(responseObject);
+      // res.success(responseObject);
     }, function(error) {
       res.error(error);
     });
