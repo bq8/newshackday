@@ -16,6 +16,7 @@ var ArticleHandler = (function() {
 
       _.forEach(result, function(article) {
         responseObject.push({
+          'objectId': article.id,
           'title': article.get('title'),
           'url': article.get('sourceId')
         });
