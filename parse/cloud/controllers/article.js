@@ -12,7 +12,16 @@ var ArticleHandler = (function() {
     q.limit(config.HEADLINE_LIMIT);
 
     q.find().then(function(result) {
-      res.success(result);
+      var responseObject = [];
+
+      _.forEach(result, function(article) {
+        responseObject.push({
+          'title': article.get('title'),
+          'url': article.get('sourceId')
+        });
+      });
+
+      res.success(responseObject);
     }, function(error) {
       res.error(error);
     });
