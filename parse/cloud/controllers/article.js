@@ -8,7 +8,7 @@ var ArticleHandler = (function() {
   function getUpdatedHeadlines(req, res) {
     var q = new Parse.Query(Article);
 
-    q.descending('createdAt');
+    q.descending('newsDate');
     q.limit(config.HEADLINE_LIMIT);
 
     q.find().then(function(result) {
@@ -53,6 +53,7 @@ var ArticleHandler = (function() {
   };
 })();
 
+// Does not check for duplicates yet!
 function retrieveNikkeiArticles(keyword) {
   var promise = new Parse.Promise();
 
@@ -60,8 +61,8 @@ function retrieveNikkeiArticles(keyword) {
     url: config.NIKKEI.BASEURL + 'xsearch',
     params: {
       keyword: keyword,
-      date_from: '2014-03-01 00:00',
-      date_to: '2014-03-08 00:00',
+      date_from: '2014-10-01 00:00',
+      date_to: '2014-10-35 00:00',
       fields: 'body index_images'
     },
     headers: {
@@ -74,16 +75,26 @@ function retrieveNikkeiArticles(keyword) {
 
       for (i = 0; i < content.hits.length; i++) {
         var article = new Article();
+        var images = [];
 
-        promises.push(article.save({
-          title: content.hits[i].title,
-          category: content.hits[i].uid,
-          body: content.hits[i].body,
-          source: 'Nikkei',
-          sourceId: content.hits[i].kiji_id,
-          display_time: content.hits[i].display_time,
-          keyword: keyword
-        }));
+        if (content.hits[i].index_images.length != 0) {
+          _.forEach(content.hits[i].index_images, function(image) {
+            images.push(image.image_path);
+          });
+
+          promises.push(article.save({
+            title: content.hits[i].title,
+            category: content.hits[i].uid,
+            body: content.hits[i].body,
+            source: 'Nikkei',
+            sourceId: content.hits[i].kiji_id,
+            display_time: content.hits[i].display_time,
+            newsDate: new Date(Date.parse(content.hits[i].display_time)),
+            keyword: keyword,
+            imageUrls: images
+          }));
+        }
+        
       }
 
       Parse.Promise.when(promises).then(function(result) {
