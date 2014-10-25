@@ -166,6 +166,7 @@
           var newsMarker1 = new google.maps.Marker({
               position: {lat: 35.6894875, lng: 139.69170639999993},
               map: worldMap,
+              icon: 'assets/alltopnews.png',
               title:"In blow to Abe, Japan trade minister to resign over funds scandal: media"
           });
 
@@ -202,6 +203,7 @@
           var newsMarker2 = new google.maps.Marker({
               position: {lat: 58.0500, lng: 118.2500},
               map: worldMap,
+              icon: 'assets/business.png',
               title:"In blow to Abe, Japan trade minister to resign over funds scandal: media"
           });
 
@@ -238,6 +240,7 @@
           var newsMarker3 = new google.maps.Marker({
               position: {lat: 38.9071923, lng: -77.03687070000001},
               map: worldMap,
+              icon: 'assets/entertainment.png',
               title:"Obama names Ebola 'czar,' bolsters Texas response "
           });
 
@@ -274,6 +277,7 @@
           var newsMarker4 = new google.maps.Marker({
               position: {lat: 27.7, lng: 85.33333300000004},
               map: worldMap,
+              icon: 'assets/science.png',
               title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
           });
 
@@ -310,6 +314,7 @@
           var newsMarker5 = new google.maps.Marker({
               position: {lat: 57.7, lng: 85.33333300000004},
               map: worldMap,
+              icon: 'assets/health.png',
               title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
           });
 
@@ -341,11 +346,49 @@
             
           });
 
-          var newsContent6 = '<div id="c6" class="content">' + '<img src="' + stories[7].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[7].attributes.title + '</p>' + '</div>'
+          var newsContent7 = '<div id="c7" class="content">' + '<img src="' + stories[6].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[6].attributes.title + '</p>' + '</div>'
+
+          var newsMarker7 = new google.maps.Marker({
+              position: {lat: 18.7, lng: 30.33333300000004},
+              map: worldMap,
+              icon: 'assets/sports.png',
+              title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
+          });
+
+          var infoBox7 = new InfoBox({
+            content: newsContent7,
+            closeBoxURL: "",
+            closeBoxMargin : "",
+            pixelOffset: boxOffset
+          });
+
+          infoBox7.open(worldMap,newsMarker7);
+          infoBox7.addListener("domready", function() {
+
+            $('#c7').on('click', function(event){
+              event.preventDefault();
+              $('.cd-panel').addClass('is-visible');
+
+              document.getElementById("article_title").innerHTML = stories[6].attributes.title;
+              document.getElementById("article_content").innerHTML = stories[6].attributes.body;
+              document.getElementById("article_image").src =  stories[6].attributes.imageUrls[0];
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+              if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+                $('.cd-panel').removeClass('is-visible');
+                event.preventDefault();
+              }
+            });
+            
+          });
+
+           var newsContent6 = '<div id="c6" class="content">' + '<img src="' + stories[7].attributes.imageUrls[0] + '" height="30" width="50">' + '<p>' + stories[7].attributes.title + '</p>' + '</div>'
 
           var newsMarker6 = new google.maps.Marker({
               position: {lat: 47.7, lng: 25.33333300000004},
               map: worldMap,
+              icon: 'assets/technology.png',
               title:"Nepali troops seek at least 40 missing on blizzard-hit trek"
           });
 
@@ -376,6 +419,7 @@
             });
             
           });
+
 
 
         },
