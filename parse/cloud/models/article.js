@@ -26,18 +26,53 @@ var Article = Parse.Object.extend('Article', {
   // Class methods
 });
 
-// Parse.Cloud.job('getNikkei', function(request, status) {
-// });
+function getUpdatedNikkeiArticles(keyword){
+  var Article = Parse.Object.extend('Article');
+
+  Parse.Cloud.httpRequest({
+    url: 'http://dac2.snnm.net:80/api/xsearch',
+    params: {
+      'keyword': keyword,
+      'fields':'body index_images',
+      'date_from': '2014-03-01 00:00',
+      'date_to': '2014-03-08 00:00',
+    },
+    headers: {
+      'X-Nikkei-Application-Id': config.NIKKEI.APP_ID
+    },
+    success: function(httpResponse) {
+      var content = JSON.parse(httpResponse.text);
+      var i;
+    
+      for(i = 0; i < 5; i++){
+        var article = new Article();
+
+        article.save({
+          title: content.hits[i].title,
+          category: content.hits[i].uid,
+          body: content.hits[i].body,
+          source: 'Nikkei',
+          sourceId: content.hits[i].kiji_id,
+          display_time: content.hits[i].display_time
+        });
+      }
+    },
+    error: function(httpResponse) {
+      console.error('Request failed with response code ' + httpResponse.status);
+      response.error();
+    }
+  });
+}
 
 Parse.Cloud.define('testDateParse', function(req, res) {
   var endDate = new Date();
 });
 
-Parse.Cloud.define('test', function(req, res) {
+Parse.Cloud.define('testOld', function(req, res) {
   Parse.Cloud.httpRequest({
     url: config.NIKKEI.BASEURL + 'xsearch',
     params: {
-      keyword: 'Waterloo',
+      keyword: 'Tokyo',
       date_from: '2014-03-01 00:00',
       date_to: '2014-03-08 00:00',
       fields: 'body index_images'
@@ -48,6 +83,7 @@ Parse.Cloud.define('test', function(req, res) {
     success: function(httpResponse) {
       console.log('Success');
       console.log(httpResponse);
+      console.log(httpResponse);
       res.success(httpResponse);
     },
     error: function(httpResponse) {
@@ -56,7 +92,6 @@ Parse.Cloud.define('test', function(req, res) {
     }
   });
 });
-
 
 
 function RetrieveCountryData(country_name, country_id){

@@ -1,7 +1,15 @@
 var ArticleHandler = require('cloud/controllers/article');
 
-Parse.Cloud.define('testmain', function(request, response) {
-  console.log('Hello world!');
+/*
+ * getUpdatedHeadlines
+ *
+ * Returns the ten most recent headlines
+ *
+ * Expected input (in request.params):
+ *   nil            : Type, none
+ */
+Parse.Cloud.define('getUpdatedHeadlines', function(request, response) {
+  ArticleHandler.getUpdatedHeadlines(request, response);
 });
 
 /*
@@ -13,5 +21,5 @@ Parse.Cloud.define('testmain', function(request, response) {
  *   articleId      : String, the objectId of the item
  */
 Parse.Cloud.define('getArticle', function(request, response) {
-
+  ArticleHandler.getArticle(request, response);
 });
