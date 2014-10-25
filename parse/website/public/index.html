@@ -7,7 +7,7 @@
     <title>TwentyFour</title>
     <!-- Bootstrap -->
     <link href="css/bootstrap.css" rel="stylesheet">
-
+    <link href="css/style.css" rel="stylesheet">
     <style type="text/css">
       html, body{ height: 100%; margin: 0; padding: 0;}
 
@@ -27,6 +27,7 @@
         background: white;
         -webkit-box-shadow: 0 0  3px #000;
         box-shadow: 0 0 3px #000;
+        cursor: pointer;
       }
 
       .content img {
@@ -42,8 +43,12 @@
 
       /*side panel css*/
       #sidePanel {
-        height: 100%;
-        width: 0px;
+        display: none;
+        width: 220px;
+        padding: 20px;
+        background-color: #333;
+        color: #fff;
+        box-shadow: inset 0 0 5px 5px #222;
       }
 
     </style>
@@ -52,11 +57,12 @@
     <!-- infoBox -->
     <script type="text/javascript" src="js/infoBox.js"></script>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
-    
+    <!-- side panel js -->
+    <script type="text/javascript" src="js/jquery.panelslider.min.js"></script>
   </head>
 
   <!--BODYYYYYYYYYYYYYY
@@ -65,8 +71,23 @@
   <body>
     <nav class="navbar navbar-default" role="navigation">TwentyFour</nav>
     <div id="mainView">
-      <div id="map-canvas"></div>
-      <div id="sidePanel"></div>
+      <a href="#">
+        <div id="map-canvas"></div>
+      </a>
+      <div class="cd-panel from-right">
+          <header class="cd-panel-header">
+              <a href="#0" class="cd-panel-close">Close</a>
+          </header>
+       
+          <div class="cd-panel-container">
+
+              <div class="cd-panel-content">
+                  <h3 id="article_title">Title Goes Here</h1>
+                    <p id="article_content">content here</p>
+                  <!-- your side content here -->
+              </div> <!-- cd-panel-content -->
+          </div> <!-- cd-panel-container -->
+      </div> <!-- cd-panel -->
     </div>
   </body>
 
@@ -114,6 +135,9 @@
           mapOptions);
       worldMap.setOptions({styles: mapStyle})
 
+      //panelslider
+      $('#sidePanel').panelslider({side: 'right', duration: 200, clickClose: true });
+
       var boxOffset = new google.maps.Size(10, -60);
 
       var newsContent1 = '<div class="content">' + '<img src="assets/story1.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'In blow to Abe, Japan trade minister to resign over funds scandal: media'  + '</p>' +'</div>';
@@ -125,13 +149,31 @@
       });
 
       var infoBox1 = new InfoBox({
-        content: newsContent1,
-        closeBoxURL: "",
-        closeBoxMargin : "",
-        pixelOffset: boxOffset
+            content: newsContent1,
+            closeBoxURL: "",
+            closeBoxMargin : "",
+            pixelOffset: boxOffset
       });
 
       infoBox1.open(worldMap,newsMarker1);
+      infoBox1.addListener("domready", function() {
+
+        $('.content').on('click', function(event){
+          event.preventDefault();
+          $('.cd-panel').addClass('is-visible');
+
+          document.getElementById("article_title").innerHTML = "In blow to Abe, Japan trade minister to resign over funds scandal: media";
+          document.getElementById("article_content").innerHTML = "CHECK OUT HTIS COOL ARTICLESDFSDFSDF";
+        });
+        //clode the lateral panel
+        $('.cd-panel').on('click', function(event){
+          if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+            $('.cd-panel').removeClass('is-visible');
+            event.preventDefault();
+          }
+        });
+        
+      });
 
       var newsContent2 = '<div class="content">' + '<img src="assets/story2.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'Rebels kill more than 20 people in east Congo village' + '</p>' +'</div>';
 
@@ -150,6 +192,11 @@
       });
 
       infoBox2.open(worldMap,newsMarker2);
+
+      infoBox2.addListener("domready", function() {
+        $(".content").on("click", function(e) { $.panelslider($('#sidePanel')); });
+        
+      });
 
       var newsContent3 = '<div class="content">' + '<img src="assets/story3.jpeg" alt="Smiley face" height="30" width="50">' + '<p>' + 'Obama names Ebola "czar," bolsters Texas response ' + '</p>' +'</div>';
 
@@ -185,9 +232,14 @@
 
       infoBox4.open(worldMap,newsMarker4);
 
+      
+
       //bind click event on infoBoxes
-      $( ".content" ).click(function() {
-        alert( "Handler for .click() called." );
+      $('.content' ).click(function() {
+        console.log("opening Side panel");
+        $.panelslider.open();
       });
+
+
     </script>
 </html>
